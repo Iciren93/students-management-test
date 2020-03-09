@@ -6,7 +6,8 @@ const users = require("./app/controllers/users.controller");
 const port = 3000;
 
 var corsOptions = {
-  origin: "http://localhost:3000"
+  origin: "http://localhost:3000",
+  origin: "https://ufinity-express.herokuapp.com"
 };
 
 app.use(cors(corsOptions));

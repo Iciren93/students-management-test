@@ -139,16 +139,17 @@ exports.suspend = (req, res) => {
 
 exports.notification = async (req, res) => {
     const teacher = req.body.teacher;
-    let matches = req.body.notification.match(/@.+@.+\..+. |@.+@.+\..+./g);
-    matches = matches ? matches.map(match => match.trim().substr(1)) : [];
+    let matches = req.body.notification.split(' ').filter(function(match) { return match.charAt(0) === '@'; }); //get those string that starts with @
+    matches = matches ? matches : [];
 
     if (teacher) {
         let students = await Users.findAll({ attributes: ['student'], where: { teacher: teacher, isSuspended: false } });
 
-        students.forEach(function(stud) {
-            if (matches.indexOf(stud.student) === -1) { matches.push(stud.student); }
-        });
-
+        if (students.length > 0) {
+            students.forEach(function(stud) {
+                if (matches.indexOf(stud.student) === -1) { matches.push(stud.student); }
+            });
+        }
         res.status(200).send(JSON.stringify({recipients: matches}));
     }
     else {
