@@ -47,7 +47,7 @@ exports.create = async (req, res) => {
         res.status(204).send(Promise.resolve());
     }
     else {
-        res.status(400).send({"message": "Invalid data provided"});
+        res.status(400).send(JSON.stringify({"message": "Invalid data provided"}));
     }
 
     function retUserObj(teacher, student){
@@ -66,7 +66,7 @@ exports.create = async (req, res) => {
             else { return Promise.resolve(); }
         } 
         catch (err) {
-            res.status(400).send({"message": err || "Some error occurred while registering teachers and students."});
+            res.status(400).send(JSON.stringify({"message": err || "Some error occurred while registering teachers and students."}));
         }
     }
 };
@@ -77,33 +77,40 @@ exports.commonStudents = async (req, res) => {
             let list = await Teachers.findAll({ where: {email: req.query.teacher}, include: Registered });
            
             if (list.length === 0) {
-                res.status(400).send({"message": "No such teacher registered!"});
+                res.status(400).send(JSON.stringify({"message": "No such teacher registered!"}));
                 return;
             }
 
             // get all studentIDs and flatten the array
-            // get only duplicates if more than 1
             list = list.map((teacher) => teacher.registereds.map((obj) => obj.studentId));
-            list = list.length > 1 ? [].concat.apply([], list).reduce((acc, v, i, arr) => arr.indexOf(v) !== i && acc.indexOf(v) === -1 ? acc.concat(v) : acc, []) : [].concat.apply([], list);
 
-            let students = await Students.findAll({ attributes: ['email'], where: { id: list }});
-
-            if (students.length === 0) {
-                res.status(400).send({"message": "No student registered to these teachers!"});
-                return;
+            let common = list[0]; // for reference
+            let found = [];
+            // check whether all the teacher have any common ids
+            list.forEach(function(arr) {
+                found.push(common.some(r=> arr.indexOf(r) >= 0));
+            });
+            
+            if (found.indexOf(false) > -1) {
+                res.status(200).send(JSON.stringify({students: []}));
             }
             else {
+                // get only duplicates if more than 1
+                list = list.length > 1 ? [].concat.apply([], list).reduce((acc, v, i, arr) => arr.indexOf(v) !== i && acc.indexOf(v) === -1 ? acc.concat(v) : acc, []) : [].concat.apply([], list);
+
+                let students = await Students.findAll({ attributes: ['email'], where: { id: list }});
                 students = students.map((obj) => obj.email);
+
                 const mssg = students.length > 1 ? { "students": students } : { "student": students[0] };
                 res.status(200).send(JSON.stringify(mssg));
             }
         }
         catch(err) {
-            res.status(400).send({"message": err || "Some error occurred while registering teachers and students."});
+            res.status(400).send(JSON.stringify({"message": err || "Some error occurred while registering teachers and students."}));
         }
     }
     else {
-        res.status(400).send({"message": "No teacher provided"});
+        res.status(400).send(JSON.stringify({"message": "No teacher provided"}));
     }
 };
 
@@ -114,14 +121,14 @@ exports.suspend = async (req, res) => {
         try {
             await Students.update({ isSuspended: true }, {where: {email: studs}});
 
-            res.status(204).send({"message": "Student is suspended"});
+            res.status(204).send(JSON.stringify({"message": "Student is suspended"}));
         }
         catch (err) {
-            res.status(400).send({"message": err || "Some error occurred while suspending students"});
+            res.status(400).send(JSON.stringify({"message": err || "Some error occurred while suspending students"}));
         }
     }
     else {
-        res.status(400).send({"message": "No students provided!"});
+        res.status(400).send(JSON.stringify({"message": "No students provided!"}));
     }
 }
 
@@ -144,14 +151,14 @@ exports.notification = async (req, res) => {
             }
             
             if (matches.length > 0) { res.status(200).send(JSON.stringify({recipients: matches})); }
-            else { res.status(400).send({"message": "No student found to send notification!"}); }
+            else { res.status(400).send(JSON.stringify({"message": "No student found to send notification!"})); }
         }
         catch {
-            res.status(400).send({"message": err || "Some error occurred while fetching list of students"});
+            res.status(400).send(JSON.stringify({"message": err || "Some error occurred while fetching list of students"}));
         }
         
     }
     else {
-        res.status(400).send({"message": "No teacher provided!"});
+        res.status(400).send(JSON.stringify({"message": "No teacher provided!"}));
     }
 };
