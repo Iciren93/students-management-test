@@ -25,7 +25,7 @@ describe("Student and teacher management system", function(){
         server
         .post('/api/register')
         .send({   
-            teacher: "teacherrao@gmail.com",   
+            teacher: "teacherken@gmail.com",   
             students:     
             [       
                 "studentdaniel@example.com",       

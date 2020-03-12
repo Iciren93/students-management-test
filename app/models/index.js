@@ -21,6 +21,11 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.users = require("./users.model.js")(sequelize, Sequelize);
+db.teachers = require("./teachers.model")(sequelize, Sequelize);
+db.students = require("./students.model")(sequelize, Sequelize);
+db.registered = require("./registered.model")(sequelize, Sequelize);
+
+db.teachers.hasMany(db.registered); // Foreign Key
+db.students.hasMany(db.registered); // Foreign Key
 
 module.exports = db;

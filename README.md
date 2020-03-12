@@ -13,9 +13,9 @@ Install dependency needed for the project:
 
     npm install
 
-## Online link hosted on Heroku
+<!-- ## Online link hosted on Heroku
 
-    https://ufinity-express.herokuapp.com
+    https://ufinity-express.herokuapp.com -->
 
 ## Authors
 
