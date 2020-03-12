@@ -44,7 +44,7 @@ exports.create = async (req, res) => {
             await addUser(user);
         }
 
-        res.status(204).send(Promise.resolve());
+        res.status(204).send();
     }
     else {
         res.status(400).send(JSON.stringify({"message": "Invalid data provided"}));
