@@ -127,7 +127,7 @@ exports.suspend = async (req, res) => {
 
 exports.notification = async (req, res) => {
     const teacher = req.body.teacher;
-    let matches = req.body.notification.split(' ').filter((match) => match.charAt(0) === '@'); //get those string that starts with @
+    let matches = req.body.notification.split(' ').filter((match) => match.charAt(0) === '@').map((email) => email.substr(1)); //get those string that starts with @
     matches = matches ? matches : [];
 
     if (teacher) {
